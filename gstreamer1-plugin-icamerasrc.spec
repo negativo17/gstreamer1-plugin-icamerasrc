@@ -1,12 +1,12 @@
-%global commit 9b2f7e3cec27d42a3bf01058b93ae22fed26cc9c
-%global date 20240411
+%global commit 1baecb1a466ad610042e437d963cb38a4cfcf592
+%global date 20240606
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           gstreamer1-plugin-icamerasrc
 Summary:        GStreamer 1.0 Intel IPU6 camera plug-in
 Version:        0
-Release:        1.%{date}git%{shortcommit}%{?dist}
-License:        LGPLv2
+Release:        2.%{date}git%{shortcommit}%{?dist}
+License:        LGPL-2.1-only
 ExclusiveArch:  x86_64
 
 Source0:        https://github.com/intel/icamerasrc/archive/%{commit}/icamerasrc-%{shortcommit}.tar.gz
@@ -48,7 +48,7 @@ autoreconf -vif
 export CHROME_SLIM_CAMHAL=ON
 export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
 # Links to libcamhal, but any libcamhal is fine, so link to the latest generation:
-export PKG_CONFIG_PATH="%{_libdir}/ipu_mtl/pkgconfig"
+export PKG_CONFIG_PATH="%{_libdir}/ipu_adl/pkgconfig"
 export CXXFLAGS="$CXXFLAGS -I%{_includedir}/hal_adaptor/api -I%{_includedir}/hal_adaptor/utils"
 %configure
 %make_build
@@ -68,5 +68,8 @@ export CXXFLAGS="$CXXFLAGS -I%{_includedir}/hal_adaptor/api -I%{_includedir}/hal
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Jun 18 2024 Simone Caronni <negativo17@gmail.com> - 0-2.20240606git1baecb1
+- Update to latest snapshot.
+
 * Tue May 07 2024 Simone Caronni <negativo17@gmail.com> - 0-1.20240411git9b2f7e3
 - First build.
