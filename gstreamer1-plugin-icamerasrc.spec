@@ -2,10 +2,15 @@
 %global date 20240606
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
+# The gstreamer provides generator causes libhal_adaptor.so init/constructor
+# function to run which fails on systems without an IPU6, do not run it on
+# the gstreamer plugin
+%global __provides_exclude_from ^(%{_libdir}/gstreamer-1\\.0/libgsticamerasrc\\.so)$
+
 Name:           gstreamer1-plugin-icamerasrc
 Summary:        GStreamer 1.0 Intel IPU6 camera plug-in
 Version:        0
-Release:        2.%{date}git%{shortcommit}%{?dist}
+Release:        3.%{date}git%{shortcommit}%{?dist}
 License:        LGPL-2.1-only
 ExclusiveArch:  x86_64
 
@@ -47,10 +52,7 @@ autoreconf -vif
 %build
 export CHROME_SLIM_CAMHAL=ON
 export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
-# Links to libcamhal, but any libcamhal is fine, so link to the latest generation:
-export PKG_CONFIG_PATH="%{_libdir}/ipu_adl/pkgconfig"
-export CXXFLAGS="$CXXFLAGS -I%{_includedir}/hal_adaptor/api -I%{_includedir}/hal_adaptor/utils"
-%configure
+%configure --with-haladaptor
 %make_build
 
 %install
@@ -68,6 +70,11 @@ export CXXFLAGS="$CXXFLAGS -I%{_includedir}/hal_adaptor/api -I%{_includedir}/hal
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Jul 04 2024 Simone Caronni <negativo17@gmail.com> - 0-3.20240606git1baecb1
+- Use hal_adaptor for building and not the specific HALs:
+  https://pkgs.rpmfusion.org/cgit/nonfree/gstreamer1-plugins-icamerasrc.git/commit/?id=00f24232d34443b62646f922d19fc798e6c7df5e
+  Damn, that was the issue!
+
 * Tue Jun 18 2024 Simone Caronni <negativo17@gmail.com> - 0-2.20240606git1baecb1
 - Update to latest snapshot.
 
