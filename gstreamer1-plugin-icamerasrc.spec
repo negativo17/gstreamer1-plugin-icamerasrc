@@ -1,16 +1,11 @@
-%global commit 154fecf069ff471a613affdf3d19724bfa3e6593
-%global date 20240929
+%global commit 0019b5d8af9d558aa7888218dfeeafef6104277a
+%global date 20241121
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-
-# The gstreamer provides generator causes libhal_adaptor.so init/constructor
-# function to run which fails on systems without an IPU6, do not run it on
-# the gstreamer plugin
-#global __provides_exclude_from ^(%{_libdir}/gstreamer-1\\.0/libgsticamerasrc\\.so)$
 
 Name:           gstreamer1-plugin-icamerasrc
 Summary:        GStreamer 1.0 Intel IPU6 camera plug-in
 Version:        0
-Release:        4.%{date}git%{shortcommit}%{?dist}
+Release:        5.%{date}git%{shortcommit}%{?dist}
 License:        LGPL-2.1-only
 ExclusiveArch:  x86_64
 
@@ -22,10 +17,11 @@ BuildRequires:  automake
 BuildRequires:  g++
 BuildRequires:  gcc
 BuildRequires:  gstreamer1-plugins-base-devel
-BuildRequires:  ipu6-camera-bins-devel
-BuildRequires:  ipu6-camera-hal-devel
 BuildRequires:  libtool
 BuildRequires:  pkgconfig(gstreamer-va-1.0)
+BuildRequires:  pkgconfig(libcamhal)
+BuildRequires:  pkgconfig(libdrm)
+BuildRequires:  pkgconfig(libdrm_intel)
 BuildRequires:  pkgconfig(libva)
 BuildRequires:  pkgconfig(libva-drm)
 BuildRequires:  pkgconfig(gstreamer-1.0) >= 1.0.0
@@ -52,7 +48,7 @@ autoreconf -vif
 %build
 export CHROME_SLIM_CAMHAL=ON
 export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
-%configure --with-haladaptor
+%configure --enable-gstdrmformat
 %make_build
 
 %install
@@ -70,6 +66,9 @@ export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Mon Nov 25 2024 Simone Caronni <negativo17@gmail.com> - 0-5.20241121git0019b5d
+- Update to latest snapshot.
+
 * Sun Oct 27 2024 Simone Caronni <negativo17@gmail.com> - 0-4.20240929git154fecf
 - Update to latest snapshot.
 
