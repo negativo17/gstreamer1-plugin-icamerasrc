@@ -1,11 +1,15 @@
-%global commit 0019b5d8af9d558aa7888218dfeeafef6104277a
-%global date 20241121
+%global commit 7f90219b0cdc00b263415e09eb8c3687daf06ab9
+%global date 20250325
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+# Disable automatic gstreamer provides with gst-inspect.
+# The plugin loads libcamhal and looks for a camera device.
+%global __provides_exclude_from ^(%{_libdir}/gstreamer-1.0/.*\\.so)$
 
 Name:           gstreamer1-plugin-icamerasrc
 Summary:        GStreamer 1.0 Intel IPU6 camera plug-in
 Version:        0
-Release:        5.%{date}git%{shortcommit}%{?dist}
+Release:        6.%{date}git%{shortcommit}%{?dist}
 License:        LGPL-2.1-only
 ExclusiveArch:  x86_64
 
@@ -43,29 +47,33 @@ This provides the necessary header files for IPU6 GStreamer plugin development.
 
 %prep
 %autosetup -p1 -n icamerasrc-%{commit}
-autoreconf -vif
 
 %build
 export CHROME_SLIM_CAMHAL=ON
-export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
-%configure --enable-gstdrmformat
+autoreconf -vif
+%configure --enable-gstdrmformat=yes
 %make_build
 
 %install
 %make_install
 
+find %{buildroot} -name "*.la" -delete
+
 %files
 %license LICENSE
-%{_libdir}/gstreamer-1.0/*
+%{_libdir}/gstreamer-1.0/libgsticamerasrc.so
 %{_libdir}/libgsticamerainterface-1.0.so.1
 %{_libdir}/libgsticamerainterface-1.0.so.1.0.0
 
 %files devel
 %{_libdir}/libgsticamerainterface-1.0.so
 %{_includedir}/gstreamer-1.0/gst/*
-%{_libdir}/pkgconfig/*
+%{_libdir}/pkgconfig/libgsticamerasrc.pc
 
 %changelog
+* Fri Jun 27 2025 Simone Caronni <negativo17@gmail.com> - 0-6.20250325git7f90219
+- Update to latest snapshot.
+
 * Mon Nov 25 2024 Simone Caronni <negativo17@gmail.com> - 0-5.20241121git0019b5d
 - Update to latest snapshot.
 
